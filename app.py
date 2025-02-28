@@ -50,5 +50,6 @@ def redirect_to_original(short_code):
     return "Invalid short URL.", 404
 
 if __name__ == "__main__":
-    # For local testing only. On Render, you'll use gunicorn or similar.
-    app.run(debug=True)
+    # Bind to 0.0.0.0 and use the PORT environment variable (default to 10000 if not set)
+    port = int(os.environ.get("PORT", 10000))
+    app.run(host="0.0.0.0", port=port, debug=False)
