@@ -1,27 +1,29 @@
 document.addEventListener("DOMContentLoaded", function() {
     const urlForm = document.getElementById("url-form");
-    const originalUrlInput = document.getElementById("original-url");
-    const shortenBtn = document.getElementById("shorten-btn");
-    const shortUrlContainer = document.getElementById("short-url-container");
-    const shortUrlPara = document.getElementById("short-url");
+    const shortenedUrlDiv = document.getElementById("shortened-url");
+    const shortUrlAnchor = document.getElementById("short-url");
 
-    shortenBtn.addEventListener("click", function(event) {
+    urlForm.addEventListener("submit", function(event) {
         event.preventDefault();
-        const originalUrl = originalUrlInput.value.trim();
-        if (originalUrl) {
-            fetch("/", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/x-www-form-urlencoded"
-                },
-                body: `original_url=${originalUrl}`
+
+        const formData = new FormData(urlForm);
+
+        fetch("/shorten", {
+            method: "POST",
+            body: new URLSearchParams(formData)
+        })
+            .then(response => {
+                if (!response.ok) throw new Error("Failed to shorten URL");
+                return response.text();
             })
-           .then(response => response.text())
-           .then(shortUrl => {
-                shortUrlPara.textContent = shortUrl;
-                shortUrlContainer.style.display = "block";
+            .then(shortUrl => {
+                shortUrlAnchor.textContent = shortUrl;
+                shortUrlAnchor.href = shortUrl;
+                shortenedUrlDiv.classList.remove("hidden");
             })
-           .catch(error => console.error(error));
-        }
+            .then(response => response.json())
+            .catch(error => {
+                console.error(error);
+            });
     });
 });
